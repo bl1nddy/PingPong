@@ -36,18 +36,46 @@ class Racket2(GameSprite):
         if keys[K_DOWN] and self.rect.y < win_height - self.rect.height:
             self.rect.y += self.speed
 
+class Ball(GameSprite):
+    def __init__(self, player_image, player_x, player_y, player_speed):
+        super().__init__(player_image, player_x, player_y, player_speed)
+        self.direction_x = 1
+        self.direction_y = 1 
+
+    def update(self):
+    
+        self.rect.x += self.speed * self.direction_x
+        self.rect.y += self.speed * self.direction_y
+
+    
+        if self.rect.y <= 0 or self.rect.y >= win_height - self.rect.height:
+            self.direction_y *= -1 
+
+        if sprite.collide_rect(self, player1) or sprite.collide_rect(self, player2):
+            self.direction_x *= -1  
+
+        if self.rect.x < 0 or self.rect.x > win_width:
+            self.rect.x = win_width // 2  
+            self.rect.y = win_height // 2  
+            self.direction_x *= -1 
+
+
 win_height = 500
 win_width = 700
 window = display.set_mode((win_width, win_height))
 display.set_caption("Ping-Pong")
 background = transform.scale(image.load("background.png"), (win_width, win_height))
 
+
 player1 = Racket1('racket.png', 0, 350, 10)
 player2 = Racket2('racket.png', 645, 350, 10)
+ball = Ball('ball.png', 250, 350, 7) 
+
+
 sprites = sprite.Group()
-players = sprite.Group()
 sprites.add(player1)
 sprites.add(player2)
+sprites.add(ball)  
 
 running = True
 finish = False
@@ -61,8 +89,8 @@ while running:
 
     if not finish:
         window.blit(background, (0, 0))
-        sprites.update()
-        sprites.draw(window)
+        sprites.update()  
+        sprites.draw(window)  
 
         display.update() 
         clock.tick(FPS)
